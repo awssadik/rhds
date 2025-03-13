@@ -1,8 +1,3 @@
-
-######################
-## clean-clinical.r ##
-######################
-
 library(here)
 readRenviron(here("config.env"))
 
