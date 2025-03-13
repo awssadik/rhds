@@ -2,3 +2,4 @@
 *.tar.gz
 *.xlsx
 config.env
+Miniforge3-Linux-x86_64.sh
