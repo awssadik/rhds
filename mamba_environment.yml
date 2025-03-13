@@ -1,0 +1,16 @@
+name: rhds
+channels:
+  - conda-forge
+dependencies:
+  - r-essentials=4.4
+  - r-base
+  - r-biocmanager=1.30
+  - ca-certificates
+  - certifi
+  - openssl
+  - r-here
+  - r-readxl
+  - r-ggplot2
+  - r-ggrepel
+  - bioconductor-illuminahumanmethylation450kanno.ilmn12.hg19
+prefix: /user/work/vi20321/opt/miniforge3/envs/rhds
