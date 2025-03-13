@@ -28,3 +28,12 @@ bash scripts/download-data.sh
 Rscript scripts/download-pan-cancer-clinical.r
 ```
 
+
+## Environment set up 
+
+```
+git clone <github URL>
+cd rhds
+mamba env create -f mamba_environment.yml
+mamba activate rhds
+```
