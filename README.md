@@ -75,13 +75,13 @@ from the downloaded files to the `data` directory
 using the following script.
 
 ```
-Rscript scripts/extract-data.r
+Rscript scripts/01-extract-data.r
 ```
 
 Final clinical phenotype cleaning is also performed
 
 ```
-Rscript scripts/03-clean-clinical.r
+Rscript scripts/02-clean-clinical.r
 ```
 
 ### DNA methylation predicted protein abundances
@@ -110,7 +110,7 @@ There are two example analyses performed in `05-analysis.qmd` and
 summarized in the `docs/05-analysis.html` report.
 
 ```
-quarto render 05-analysis.qmd
+quarto render 05-analysis.qmd --output-dir docs
 ```
 
 1. The methylation dataset has observations performed on both tumor and 
