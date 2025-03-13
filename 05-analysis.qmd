@@ -1,7 +1,17 @@
-################
-## analysis.r ##
-################
+---
+title: "Analysis of predicted protein levels in tumour samples"
+author: "Aws Sadik"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+format: 
+  html:
+    toc: true
+    toc-location: left
+---
 
+```{r}
+#| label: setup
+#| include: false 
+ 
 library(ggplot2)
 library(ggrepel)
 library(here)
@@ -9,24 +19,29 @@ readRenviron(here("config.env"))
 
 datadir <- Sys.getenv("datadir")
 resultsdir <- Sys.getenv("resultsdir")
-
-# load.data
-combined.filename <- file.path(resultsdir, "combined-clin-pred-proteins.txt")
-data <- read.table(combined.filename,
-  header = T, sep = "\t", stringsAsFactors = F
-)
+```
 
 
-# names
-protein.names <-
-  subset(
-    meffonym::meffonym.models(full = T),
-    grepl("^episcores", filename)
-  )$name
+```{r}
+#| label: load data
+#| include: FALSE
+
+filename <- file.path(resultsdir, "combined-clin-pred-proteins.txt")
+# Load data
+data <- read.table(filename, header = T, sep = "\t", stringsAsFactors = F)
+
+# Protein names
+protein.names <- subset(meffonym::meffonym.models(full = T),
+    grepl("^episcores", filename))$name
 protein.names <- make.names(protein.names)
+
 
 table(protein.names %in% colnames(data))
 
+```
+
+```{r}
+#| label: run GLMS
 
 ## Run glms for association between proteins levels and tissue type (tumor vs. normal)
 
@@ -63,6 +78,10 @@ fit.coefs <- {
 bonferroni <- -log10(0.05 / length(fit))
 
 
+```
+
+```{r}
+#| label: visualise results
 ### Visualize results
 
 # tissue.figs
@@ -92,7 +111,55 @@ fit.coefs |>
   )
 
 
+```
 
+
+```{r}
+#| label: run glms 2
+
+## Run glms for association between proteins levels and progression free interval (PFI)
+
+# This analysis should be restricted to measurements taken from tumor samples
+
+# pfi
+tumor.data <- subset(data, tumor == 1)
+
+## define glm formulae with pred.proteins as predictors of pfi
+## tissue i.e. pfi ~ pred.protein
+formulae <- sapply(protein.names, function(i) {
+  reformulate(i, response = "pfi")
+}, simplify = F)
+
+# run glms
+fit <- sapply(formulae, function(i) {
+  glm(i, data = tumor.data, family = binomial())
+}, simplify = F)
+
+fit.summary <- sapply(fit, function(i) {
+  out <- summary(i)$coefficients
+  out[, "Estimate"] <- out[, "Estimate"]
+  out
+}, simplify = F)
+
+fit.coefs <- sapply(fit.summary, function(i) {
+  i[2, c("Estimate", "Pr(>|z|)")]
+}, simplify = F)
+fit.coefs <- {
+  x <- do.call(rbind, fit.coefs)
+  data.frame(
+    pred.protein = rownames(x),
+    coef = x[, "Estimate"],
+    p.value = x[, "Pr(>|z|)"]
+  )
+}
+
+
+``` 
+
+
+```{r}
+#| label: visualise 2
+#| 
 ### Visualize results
 
 # pfi.figs
@@ -121,3 +188,5 @@ fit.coefs |>
     linetype = "dashed"
   )
 
+
+```
